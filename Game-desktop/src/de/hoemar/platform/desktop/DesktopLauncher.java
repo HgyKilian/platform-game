@@ -1,9 +1,9 @@
-package de.hgykilian.scrabble.desktop;
+package de.hoemar.platform.desktop;
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 
-import de.hgykilian.scrabble.GameMain;
+import de.hoemar.platform.GameMain;
 
 public class DesktopLauncher {
 	public static void main (String[] arg) {

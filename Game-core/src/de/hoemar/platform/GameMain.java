@@ -1,4 +1,4 @@
-package de.hgykilian.scrabble;
+package de.hoemar.platform;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
