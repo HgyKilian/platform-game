@@ -5,8 +5,8 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 
 public abstract class Character {
 
-	int x = 0;
-	int y = 32 * 6;
+	int x = 100;
+	int y = 32 * 8;
 	Texture texture;
 	
 	public abstract void render(Batch batch, float deltaTime);

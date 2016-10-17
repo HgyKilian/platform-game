@@ -2,9 +2,11 @@ package de.hoemar.platform;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
@@ -12,26 +14,25 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Matrix4;
 
-public class GameMain extends ApplicationAdapter implements MapRenderer  {
+public class GameMain extends ApplicationAdapter {
 	
 	TiledMap map;
 	MapRenderer mapRenderer;
 	OrthographicCamera camera;
 	int a = 0;
 	GameCharacter character;
-	Batch batch;
 	CollisionDetection collision;
+	SpriteBatch batch;
+	static int width = 800;
+	static int height = 600;
 	
 	@Override
 	public void create () {
 		map = new TmxMapLoader().load("tilemap.tmx");
-		TiledMapTileLayer layer = (TiledMapTileLayer)map.getLayers().get(0);
-		float unitScale = 1 / 32f;
-		OrthogonalTiledMapRenderer renderer = new OrthogonalTiledMapRenderer(map, unitScale);
-		camera = new OrthographicCamera();
-		camera.setToOrtho(false, 25, 25);
-		mapRenderer = new OrthogonalTiledMapRenderer(map, unitScale);
-		batch = renderer.getBatch();
+		camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		camera.setToOrtho(false, 25*32, 25*24);
+		mapRenderer = new OrthogonalTiledMapRenderer(map);
+		batch = new SpriteBatch();
 		character = new GameCharacter();
 		collision = new CollisionDetection(map);
 	}
@@ -44,36 +45,42 @@ public class GameMain extends ApplicationAdapter implements MapRenderer  {
 		float deltaTime = Gdx.graphics.getDeltaTime();
 		
 //		a++;
-		camera.position.x = 13;
+		camera.position.x = 400 - 100 + character.x;
 		camera.update();
 		mapRenderer.setView(camera);
 		mapRenderer.render();
 
-		if (collision.checkCollision(character, 0)){
-			character.changePosition(0);
-		}
+		getKeyboardInput();
 		
+		batch.setProjectionMatrix(camera.projection);
 		batch.begin();
 		character.render(batch, deltaTime);
 		batch.end();
         
 	}
-
-	@Override
-	public void render(int[] arg0) {
-		// TODO Auto-generated method stub
+	
+	public void getKeyboardInput() {
+		if (Gdx.input.isKeyPressed(Keys.SPACE)){
+			if (collision.checkCollision(character, 3)){
+				character.changePosition(3);
+			}
+		}
+//		} else {
+//			if (collision.checkCollision(character, 0)){
+//				character.changePosition(0);
+//			}
+//		}
 		
-	}
-
-	@Override
-	public void setView(OrthographicCamera arg0) {
-		// TODO Auto-generated method stub
+		if (Gdx.input.isKeyPressed(Keys.RIGHT)){ 
+			if (collision.checkCollision(character, 0)){
+				character.changePosition(0);
+			}
+		}
 		
-	}
-
-	@Override
-	public void setView(Matrix4 arg0, float arg1, float arg2, float arg3, float arg4) {
-		// TODO Auto-generated method stub
-		
+		if (Gdx.input.isKeyPressed(Keys.LEFT)){
+			if (collision.checkCollision(character, 2)){
+				character.changePosition(2);
+			}
+		}
 	}
 }

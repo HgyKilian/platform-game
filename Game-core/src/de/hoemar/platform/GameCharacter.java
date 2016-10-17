@@ -1,19 +1,22 @@
 package de.hoemar.platform;
 
-import javax.sql.rowset.CachedRowSet;
-
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 
 public class GameCharacter extends Character {
 
+	Sprite sprite;
+	
 	public GameCharacter() {
 		texture = new Texture("Figur.png");
+		sprite = new Sprite(texture);
+		sprite.setBounds(100 - (GameMain.width/2), y - (GameMain.height/2), 32, 32);
 	}
 
 	@Override
 	public void render(Batch batch, float deltaTime) {
-		batch.draw(texture, x, y, 32, 32);		
+		sprite.draw(batch);
 	}
 	
 	public void changePosition(int direction) {
@@ -24,6 +27,7 @@ public class GameCharacter extends Character {
 			case 3: y++; break;
 			default: break;
 		}
+		sprite.setPosition(100 - (GameMain.width/2), y - (GameMain.height/2));
 			
 	}
 
