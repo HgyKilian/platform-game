@@ -18,9 +18,11 @@ public class CollisionDetection {
 //	public Array<Rectangle> tiles = new Array<Rectangle>();
 	
 	TiledMapTileLayer layer;
+	static CollisionDetection collisionDetection;
 	
 	public CollisionDetection(TiledMap map) {
 		layer = (TiledMapTileLayer)map.getLayers().get(0);
+		collisionDetection = this;
 		
 	}
 	

@@ -23,6 +23,8 @@ public class GameMain extends ApplicationAdapter {
 	GameCharacter character;
 	CollisionDetection collision;
 	SpriteBatch batch;
+	boolean isJumping = false;
+	int jumpingHeight = 0;
 	static int width = 800;
 	static int height = 600;
 	
@@ -42,6 +44,7 @@ public class GameMain extends ApplicationAdapter {
 		Gdx.gl.glClearColor(1, 1, 1, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
+
 		float deltaTime = Gdx.graphics.getDeltaTime();
 		
 //		a++;
@@ -50,7 +53,14 @@ public class GameMain extends ApplicationAdapter {
 		mapRenderer.setView(camera);
 		mapRenderer.render();
 
-		getKeyboardInput();
+		if (isJumping) {
+			jump(deltaTime);
+		} else {
+			if (collision.checkCollision(character, 1)){
+				character.changePosition(1, Math.round(deltaTime*256));
+			}
+		}
+		getKeyboardInput(deltaTime);
 		
 		batch.setProjectionMatrix(camera.projection);
 		batch.begin();
@@ -59,27 +69,40 @@ public class GameMain extends ApplicationAdapter {
         
 	}
 	
-	public void getKeyboardInput() {
+	private void jump(float deltaTime) {
+		if (collision.checkCollision(character, 3)){
+			int amount = Math.round(deltaTime*256);
+			jumpingHeight+=amount;
+			if (jumpingHeight >= 128) {
+				amount-= (jumpingHeight-128);
+				jumpingHeight = 0;
+				isJumping = false;
+			}
+			character.changePosition(3, amount);
+		} else {
+			isJumping = false;
+			jumpingHeight = 0;
+		}
+		
+	}
+
+	public void getKeyboardInput(float deltaTime) {
 		
 		if (Gdx.input.isKeyPressed(Keys.RIGHT)){ 
 			if (collision.checkCollision(character, 0)){
-				character.changePosition(0);
+				character.changePosition(0, Math.round(deltaTime*256));
 			}
 		}
 		
 		if (Gdx.input.isKeyPressed(Keys.LEFT)){
 			if (collision.checkCollision(character, 2)){
-				character.changePosition(2);
+				character.changePosition(2, Math.round(deltaTime*256));
 			}
 		}
 		
 		if (Gdx.input.isKeyPressed(Keys.SPACE)){
-			if (collision.checkCollision(character, 3)){
-				character.changePosition(3);
-			}
-		} else {
-			if (collision.checkCollision(character, 1)){
-				character.changePosition(1);
+			if (collision.checkCollision(character, 3) && !collision.checkCollision(character, 1)){
+				isJumping = true;
 			}
 		}
 		
