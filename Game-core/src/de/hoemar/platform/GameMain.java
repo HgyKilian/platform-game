@@ -60,16 +60,6 @@ public class GameMain extends ApplicationAdapter {
 	}
 	
 	public void getKeyboardInput() {
-		if (Gdx.input.isKeyPressed(Keys.SPACE)){
-			if (collision.checkCollision(character, 3)){
-				character.changePosition(3);
-			}
-		}
-//		} else {
-//			if (collision.checkCollision(character, 0)){
-//				character.changePosition(0);
-//			}
-//		}
 		
 		if (Gdx.input.isKeyPressed(Keys.RIGHT)){ 
 			if (collision.checkCollision(character, 0)){
@@ -82,5 +72,16 @@ public class GameMain extends ApplicationAdapter {
 				character.changePosition(2);
 			}
 		}
+		
+		if (Gdx.input.isKeyPressed(Keys.SPACE)){
+			if (collision.checkCollision(character, 3)){
+				character.changePosition(3);
+			}
+		} else {
+			if (collision.checkCollision(character, 1)){
+				character.changePosition(1);
+			}
+		}
+		
 	}
 }

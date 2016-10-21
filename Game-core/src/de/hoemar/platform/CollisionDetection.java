@@ -25,20 +25,23 @@ public class CollisionDetection {
 	}
 	
 	public boolean checkCollision(Character character, int direction) {
-		int x_pos = (int) Math.floor(character.x / 32f);
-		int y_pos = (int) Math.floor(character.y / 32f);
+		int x_pos1 = (int) ((direction == 2) ?  Math.ceil(character.x / 32f) : Math.floor(character.x / 32f));
+		int y_pos1 = (int) ((direction == 1) ?  Math.ceil(character.y / 32f) : Math.floor(character.y / 32f));
+		int x_pos2 = (int) ((direction == 1 || direction == 3 || direction == 2) ?  Math.ceil(character.x / 32f) : Math.floor(character.x / 32f));
+		int y_pos2 = (int) ((direction == 0 || direction == 2 || direction ==1) ?  Math.ceil(character.y / 32f) : Math.floor(character.y / 32f));
 		switch (direction) {
-			case 0: x_pos++; break;
-			case 1: break;
-			case 2: break;
-			case 3: y_pos++; break;
+			case 0: x_pos1++; x_pos2++; break;
+			case 1: y_pos1--; y_pos2--; break;
+			case 2: x_pos1--; x_pos2--; break;
+			case 3: y_pos1++; y_pos2++; break;
 			default: break;
 		}
-		Cell cell = layer.getCell(x_pos, y_pos);
-		if (cell != null) {
-			return false;
+   	 	Cell cell1 = layer.getCell(x_pos1, y_pos1);
+  	 	Cell cell2 = layer.getCell(x_pos2, y_pos2);
+		if (cell1 == null && cell2 == null) {
+			return true;
 		}
-		return true;
+		return false;
 		
 	}
 	
