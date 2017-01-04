@@ -3,15 +3,18 @@ package de.hoemar.platform;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.Rectangle;
 
 public class GameCharacter extends Character {
 
 	Sprite sprite;
+	Rectangle rectangle;
 	
 	public GameCharacter() {
 		texture = new Texture("Figur.png");
 		sprite = new Sprite(texture);
 		sprite.setBounds(100 - (GameMain.width/2), y - (GameMain.height/2), 32, 32);
+		rectangle = new Rectangle(x, y - (GameMain.height/2), 32, 32);
 	}
 
 	@Override
@@ -32,16 +35,17 @@ public class GameCharacter extends Character {
 		if (testagain) {
 			if (!CollisionDetection.collisionDetection.checkCollision(this, direction)) {
 				switch (direction) {
-					case 0: x = ((int) Math.floor(x/32)) * 32 ; break;
-					case 1: y = ((int) Math.ceil(y/32)) * 32; break;
-					case 2: x = ((int) Math.ceil(x/32)) * 32; break;
-					case 3: y = ((int) Math.floor(y/32)) * 32; break;
+					case 0: x = ((int) Math.floor(x/32f)) * 32 ; break;
+					case 1: y = ((int) Math.ceil(y/32f)) * 32; break;
+					case 2: x = ((int) Math.ceil(x/32f)) * 32; break;
+					case 3: y = ((int) Math.floor(y/32f)) * 32; break;
 					default: break;
 				}
 			}
 		}
 		
 		sprite.setPosition(100 - (GameMain.width/2), y - (GameMain.height/2));
+		rectangle.set(x, y - (GameMain.height/2), 32, 32);
 			
 	}
 

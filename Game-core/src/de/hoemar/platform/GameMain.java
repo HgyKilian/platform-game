@@ -1,18 +1,18 @@
 package de.hoemar.platform;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.math.Matrix4;
 
 public class GameMain extends ApplicationAdapter {
 	
@@ -21,12 +21,18 @@ public class GameMain extends ApplicationAdapter {
 	OrthographicCamera camera;
 	int a = 0;
 	GameCharacter character;
+	ArrayList<Enemy> enemys = new ArrayList<Enemy>();
 	CollisionDetection collision;
 	SpriteBatch batch;
 	boolean isJumping = false;
+	boolean isFalling = false;
 	int jumpingHeight = 0;
 	static int width = 800;
 	static int height = 600;
+	BitmapFont font;
+	int leben = 5;
+	int killedEnemys = 0;
+	final int EnemysToKill = 20;
 	
 	@Override
 	public void create () {
@@ -34,8 +40,13 @@ public class GameMain extends ApplicationAdapter {
 		camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		camera.setToOrtho(false, 25*32, 25*24);
 		mapRenderer = new OrthogonalTiledMapRenderer(map);
+		font = new BitmapFont();
+		font.setColor(0, 0, 0, 1);
 		batch = new SpriteBatch();
 		character = new GameCharacter();
+		for (int i=0 ; i<10 ; i++) {
+			enemys.add(new Enemy());
+		}
 		collision = new CollisionDetection(map);
 	}
 
@@ -46,9 +57,10 @@ public class GameMain extends ApplicationAdapter {
 		
 
 		float deltaTime = Gdx.graphics.getDeltaTime();
-		
-//		a++;
+				
+		int oldCameraPosition = (int) camera.position.x;
 		camera.position.x = 400 - 100 + character.x;
+		oldCameraPosition = (int) (camera.position.x - oldCameraPosition);
 		camera.update();
 		mapRenderer.setView(camera);
 		mapRenderer.render();
@@ -57,14 +69,37 @@ public class GameMain extends ApplicationAdapter {
 			jump(deltaTime);
 		} else {
 			if (collision.checkCollision(character, 1)){
+				isFalling = true;
 				character.changePosition(1, Math.round(deltaTime*256));
+			} else {
+				isFalling = false;
 			}
 		}
 		getKeyboardInput(deltaTime);
+		for (Enemy e : enemys) {
+			if (e.rectangle.overlaps(character.rectangle)) {
+				if (!isFalling) {
+					//verloren
+					enemys.remove(e);
+					leben--;
+				} else {
+					//Gegener besiegt
+					enemys.remove(e);
+					killedEnemys++;
+				}
+				break;
+			}
+		}
 		
 		batch.setProjectionMatrix(camera.projection);
 		batch.begin();
 		character.render(batch, deltaTime);
+		for (int i=0 ; i<enemys.size() ; i++) {
+			enemys.get(i).updatePosition(oldCameraPosition);
+			enemys.get(i).render(batch, deltaTime);
+		}
+		font.draw(batch, "Leben: " + leben, -380, 280);
+		font.draw(batch, "Feinde: " + killedEnemys + "/" + EnemysToKill, -380, 250);
 		batch.end();
         
 	}
@@ -103,6 +138,7 @@ public class GameMain extends ApplicationAdapter {
 		if (Gdx.input.isKeyPressed(Keys.SPACE)){
 			if (collision.checkCollision(character, 3) && !collision.checkCollision(character, 1)){
 				isJumping = true;
+				isFalling = false;
 			}
 		}
 		
