@@ -45,7 +45,7 @@ public class GameMain extends ApplicationAdapter {
 		batch = new SpriteBatch();
 		character = new GameCharacter();
 		for (int i=0 ; i<10 ; i++) {
-			enemys.add(new Enemy());
+			enemys.add(new Enemy(EnemyPosition.level1[i][0], EnemyPosition.level1[i][1]));
 		}
 		collision = new CollisionDetection(map);
 	}
@@ -61,6 +61,7 @@ public class GameMain extends ApplicationAdapter {
 		int oldCameraPosition = (int) camera.position.x;
 		camera.position.x = 400 - 100 + character.x;
 		oldCameraPosition = (int) (camera.position.x - oldCameraPosition);
+		int totalX = (int) (camera.position.x - 400);
 		camera.update();
 		mapRenderer.setView(camera);
 		mapRenderer.render();
@@ -90,12 +91,15 @@ public class GameMain extends ApplicationAdapter {
 				break;
 			}
 		}
+		for (Enemy e : enemys) {
+			e.changePosition(Math.round(deltaTime*32));
+		}
 		
 		batch.setProjectionMatrix(camera.projection);
 		batch.begin();
 		character.render(batch, deltaTime);
 		for (int i=0 ; i<enemys.size() ; i++) {
-			enemys.get(i).updatePosition(oldCameraPosition);
+			enemys.get(i).updatePosition(totalX);
 			enemys.get(i).render(batch, deltaTime);
 		}
 		font.draw(batch, "Leben: " + leben, -380, 280);

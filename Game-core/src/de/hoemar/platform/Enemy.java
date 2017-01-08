@@ -9,12 +9,18 @@ public class Enemy extends Character {
 
 	Sprite sprite;
 	Rectangle rectangle;
+	final int startPosition;
+	final int returnPosition;
+	boolean direction = false;
 	
-	public Enemy() {
+	public Enemy(int startPositon, int returnPosition) {
 		texture = new Texture("Figur.png");
 		sprite = new Sprite(texture);
-		sprite.setBounds((float) (Math.random()*450) - 400, y - (GameMain.height/2), 32, 32);
-		rectangle = new Rectangle ((float) (sprite.getX()+400), y - (GameMain.height/2), 32, 32);
+		x = startPositon*32-400;
+		sprite.setBounds(x, y - (GameMain.height/2), 32, 32);
+		rectangle = new Rectangle (x+400, y - (GameMain.height/2), 32, 32);
+		this.startPosition = startPositon;
+		this.returnPosition = returnPosition;
 	}
 	
 	@Override
@@ -22,11 +28,26 @@ public class Enemy extends Character {
 		sprite.draw(batch);
 	}
 	
-	public void updatePosition(int x) {
-		sprite.setX(sprite.getX() - x);
+	public void updatePosition(int totalX) {
+		sprite.setX(sprite.getX() - totalX);
 	}
 	
-	public void changePosition(int direction, int amount) {
+	public void changePosition(int amount) {
+		if (direction) {
+			x+=amount;
+			if (Math.floor((x+400)/32f)+1 >= startPosition) {
+				x-= amount;
+				direction = false;
+			}
+		} else {
+			x-=amount;
+			if (Math.floor((x+400)/32f) <= returnPosition-1) {
+				x+= amount;
+				direction = true;
+			}
+		}
+		sprite.setPosition(x, y - (GameMain.height/2));
+		rectangle.set(x+400, y - (GameMain.height/2), 32, 32);
 		
 	}
 
