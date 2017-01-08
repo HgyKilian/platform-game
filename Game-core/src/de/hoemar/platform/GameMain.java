@@ -7,7 +7,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -33,6 +35,11 @@ public class GameMain extends ApplicationAdapter {
 	int leben = 5;
 	int killedEnemys = 0;
 	final int EnemysToKill = 20;
+	int win = 0;
+	Sprite overlay;
+	final int gravity = 2048;
+	int oldPositionY;
+	
 	
 	@Override
 	public void create () {
@@ -58,70 +65,125 @@ public class GameMain extends ApplicationAdapter {
 
 		float deltaTime = Gdx.graphics.getDeltaTime();
 				
-		int oldCameraPosition = (int) camera.position.x;
-		camera.position.x = 400 - 100 + character.x;
-		oldCameraPosition = (int) (camera.position.x - oldCameraPosition);
 		int totalX = (int) (camera.position.x - 400);
+		camera.position.x = 300 + character.x;
 		camera.update();
 		mapRenderer.setView(camera);
 		mapRenderer.render();
 
-		if (isJumping) {
+		if (win == 0) {
+//			if (isJumping) {
+//				jump(deltaTime);
+//			} else {
+//				if (collision.checkCollision(character, 1)){
+//					isFalling = true;
+//					character.changePosition(1, Math.round(deltaTime*256));
+//				} else {
+//					isFalling = false;
+//				}
+//			}
 			jump(deltaTime);
-		} else {
-			if (collision.checkCollision(character, 1)){
-				isFalling = true;
-				character.changePosition(1, Math.round(deltaTime*256));
-			} else {
-				isFalling = false;
-			}
-		}
-		getKeyboardInput(deltaTime);
-		for (Enemy e : enemys) {
-			if (e.rectangle.overlaps(character.rectangle)) {
-				if (!isFalling) {
-					//verloren
-					enemys.remove(e);
-					leben--;
-				} else {
-					//Gegener besiegt
-					enemys.remove(e);
-					killedEnemys++;
+			getKeyboardInput(deltaTime);
+			for (Enemy e : enemys) {
+				if (e.rectangle.overlaps(character.rectangle)) {
+					if (!isFalling) {
+						//verloren
+						enemys.remove(e);
+						leben--;
+						if (leben <= 0) {
+							overlay = new Sprite(new Texture("loose.png"));
+							overlay.setBounds(-400, -300, 800, 600);
+							win = -1;
+						}
+						
+					} else {
+						//Gegener besiegt
+						enemys.remove(e);
+						killedEnemys++;
+//						win = 1;
+//						overlay.setTexture(new Texture("win.png"));
+						
+					}
+					break;
 				}
-				break;
 			}
-		}
-		for (Enemy e : enemys) {
-			e.changePosition(Math.round(deltaTime*32));
+			for (Enemy e : enemys) {
+				e.changePosition(Math.round(deltaTime*32));
+			}
 		}
 		
 		batch.setProjectionMatrix(camera.projection);
 		batch.begin();
-		character.render(batch, deltaTime);
-		for (int i=0 ; i<enemys.size() ; i++) {
-			enemys.get(i).updatePosition(totalX);
-			enemys.get(i).render(batch, deltaTime);
+		if (win == 0) {
+			character.render(batch, deltaTime);
+			for (int i=0 ; i<enemys.size() ; i++) {
+				enemys.get(i).updatePosition(totalX);
+				enemys.get(i).render(batch, deltaTime);
+			}
+			font.draw(batch, "Leben: " + leben, -380, 280);
+			font.draw(batch, "Feinde: " + killedEnemys + "/" + EnemysToKill, -380, 250);
+		} else {
+			overlay.draw(batch);
 		}
-		font.draw(batch, "Leben: " + leben, -380, 280);
-		font.draw(batch, "Feinde: " + killedEnemys + "/" + EnemysToKill, -380, 250);
 		batch.end();
         
 	}
 	
 	private void jump(float deltaTime) {
-		if (collision.checkCollision(character, 3)){
-			int amount = Math.round(deltaTime*256);
-			jumpingHeight+=amount;
-			if (jumpingHeight >= 128) {
-				amount-= (jumpingHeight-128);
-				jumpingHeight = 0;
-				isJumping = false;
+		System.out.println(character.y);
+//		character.jumpTime+=deltaTime;
+		character.velocity = character.velocity - gravity*deltaTime;
+//		character.jumpTime = character.jumpTime - gravity*deltaTime;
+//		int amount = (int) Math.round(character.jumpStartVelocity*character.jumpTime-0.5*gravity*Math.pow(character.jumpTime,2)-character.brakeVelocity*character.jumpTime);
+		int amount = Math.round(character.velocity*deltaTime);
+		if (amount >= 0) {//hoch
+			if (collision.checkCollision(character, 3)){
+//				jumpingHeight+=amount;
+//				if (jumpingHeight >= 128) {
+//					amount-= (jumpingHeight-128);
+//					jumpingHeight = 0;
+//					isJumping = false;
+//				}
+				character.changePosition(3, Math.abs(amount));
+				
+				
+			} else {
+//				character.jumpTime = 0;
+				character.velocity = 0;
+				isFalling = true;
+//				character.brakeVelocity = Math.round(character.jumpStartVelocity - gravity*character.jumpTime);
 			}
-			character.changePosition(3, amount);
-		} else {
-			isJumping = false;
-			jumpingHeight = 0;
+		} else {//runter
+			if (collision.checkCollision(character, 1)){
+				if (!isFalling) {
+					isFalling = true;
+//					character.jumpStartPosition = character.y;
+//					character.jumpStartVelocity = 512;
+				}	
+//				jumpingHeight+=amount;
+//				if (jumpingHeight >= 128) {
+//					amount-= (jumpingHeight-128);
+//					jumpingHeight = 0;
+//					isJumping = false;
+//				}
+				character.changePosition(1, Math.abs(amount));
+			} else {
+				character.velocity=0;
+				if (isFalling) {
+//					character.jumpTime = 0;
+//					character.jumpStartPosition = 0;
+//					character.jumpStartVelocity = 0;
+					
+					isFalling = false;
+				}
+				
+			}
 		}
+		
+//			else {
+//			isJumping = false;
+//			jumpingHeight = 0;
+//		}
 		
 	}
 
@@ -141,8 +203,13 @@ public class GameMain extends ApplicationAdapter {
 		
 		if (Gdx.input.isKeyPressed(Keys.SPACE)){
 			if (collision.checkCollision(character, 3) && !collision.checkCollision(character, 1)){
-				isJumping = true;
+//				character.jumpTime = 0;
+//				character.jumpStartPosition = character.y;
+//				character.jumpStartVelocity = 512;
+				character.velocity = 768;
 				isFalling = false;
+//				isJumping = true;
+//				isFalling = false;
 			}
 		}
 		
