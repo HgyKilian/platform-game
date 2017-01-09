@@ -18,9 +18,13 @@ public class CollisionDetection {
 	static CollisionDetection collisionDetection;
 	
 	public CollisionDetection(TiledMap map) {
-		layer = (TiledMapTileLayer)map.getLayers().get(0);
+		layer = (TiledMapTileLayer)map.getLayers().get("Kachelebene 1");
 		collisionDetection = this;
 		
+	}
+	
+	public void changeMap(TiledMap map) {
+		layer = (TiledMapTileLayer)map.getLayers().get("Kachelebene 1");
 	}
 	
 	public boolean checkCollision(Character character, int direction) {
@@ -37,6 +41,10 @@ public class CollisionDetection {
 		}
    	 	Cell cell1 = layer.getCell(x_pos1, y_pos1);
   	 	Cell cell2 = layer.getCell(x_pos2, y_pos2);
+  	 	if(cell1!=null){
+  	 		System.out.println(cell1.getTile().getId());
+  	 	}
+  	 	
 		if (cell1 == null && cell2 == null) {
 			return true;
 		}

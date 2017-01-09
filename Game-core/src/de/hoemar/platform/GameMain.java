@@ -55,6 +55,7 @@ public class GameMain extends ApplicationAdapter {
 			enemys.add(new Enemy(EnemyPosition.level1[i][0], EnemyPosition.level1[i][1]));
 		}
 		collision = new CollisionDetection(map);
+		changeMap(1);
 	}
 
 	@Override
@@ -72,18 +73,11 @@ public class GameMain extends ApplicationAdapter {
 		mapRenderer.render();
 
 		if (win == 0) {
-//			if (isJumping) {
-//				jump(deltaTime);
-//			} else {
-//				if (collision.checkCollision(character, 1)){
-//					isFalling = true;
-//					character.changePosition(1, Math.round(deltaTime*256));
-//				} else {
-//					isFalling = false;
-//				}
-//			}
 			jump(deltaTime);
 			getKeyboardInput(deltaTime);
+			if (character.y <= -300) {
+				verloren();
+			}
 			for (Enemy e : enemys) {
 				if (e.rectangle.overlaps(character.rectangle)) {
 					if (!isFalling) {
@@ -91,9 +85,7 @@ public class GameMain extends ApplicationAdapter {
 						enemys.remove(e);
 						leben--;
 						if (leben <= 0) {
-							overlay = new Sprite(new Texture("loose.png"));
-							overlay.setBounds(-400, -300, 800, 600);
-							win = -1;
+							verloren();
 						}
 						
 					} else {
@@ -130,60 +122,30 @@ public class GameMain extends ApplicationAdapter {
 	}
 	
 	private void jump(float deltaTime) {
-		System.out.println(character.y);
-//		character.jumpTime+=deltaTime;
 		character.velocity = character.velocity - gravity*deltaTime;
-//		character.jumpTime = character.jumpTime - gravity*deltaTime;
-//		int amount = (int) Math.round(character.jumpStartVelocity*character.jumpTime-0.5*gravity*Math.pow(character.jumpTime,2)-character.brakeVelocity*character.jumpTime);
 		int amount = Math.round(character.velocity*deltaTime);
 		if (amount >= 0) {//hoch
 			if (collision.checkCollision(character, 3)){
-//				jumpingHeight+=amount;
-//				if (jumpingHeight >= 128) {
-//					amount-= (jumpingHeight-128);
-//					jumpingHeight = 0;
-//					isJumping = false;
-//				}
 				character.changePosition(3, Math.abs(amount));
-				
-				
 			} else {
-//				character.jumpTime = 0;
 				character.velocity = 0;
 				isFalling = true;
-//				character.brakeVelocity = Math.round(character.jumpStartVelocity - gravity*character.jumpTime);
 			}
 		} else {//runter
 			if (collision.checkCollision(character, 1)){
 				if (!isFalling) {
 					isFalling = true;
-//					character.jumpStartPosition = character.y;
-//					character.jumpStartVelocity = 512;
 				}	
-//				jumpingHeight+=amount;
-//				if (jumpingHeight >= 128) {
-//					amount-= (jumpingHeight-128);
-//					jumpingHeight = 0;
-//					isJumping = false;
-//				}
 				character.changePosition(1, Math.abs(amount));
 			} else {
 				character.velocity=0;
-				if (isFalling) {
-//					character.jumpTime = 0;
-//					character.jumpStartPosition = 0;
-//					character.jumpStartVelocity = 0;
-					
+				if (isFalling) {		
 					isFalling = false;
 				}
 				
 			}
 		}
 		
-//			else {
-//			isJumping = false;
-//			jumpingHeight = 0;
-//		}
 		
 	}
 
@@ -203,15 +165,44 @@ public class GameMain extends ApplicationAdapter {
 		
 		if (Gdx.input.isKeyPressed(Keys.SPACE)){
 			if (collision.checkCollision(character, 3) && !collision.checkCollision(character, 1)){
-//				character.jumpTime = 0;
-//				character.jumpStartPosition = character.y;
-//				character.jumpStartVelocity = 512;
 				character.velocity = 768;
 				isFalling = false;
 //				isJumping = true;
-//				isFalling = false;
+
 			}
 		}
+		
+	}
+	
+	private void changeMap(int i) {
+	    Gdx.app.postRunnable(() -> { 
+	    	switch(i){
+	    	case 1 : map = new TmxMapLoader().load("map1.tmx");
+	
+	    	
+	    	break;
+	    	case 2 : map = new TmxMapLoader().load("map2.tmx");
+	   
+		
+	    	break;
+	    	case 3 : map = new TmxMapLoader().load("map3.tmx");
+	    	break;
+	    	default: break;}
+	    	((OrthogonalTiledMapRenderer) mapRenderer).dispose(); 
+	    	collision.changeMap(map);
+	    	mapRenderer = new OrthogonalTiledMapRenderer(map);
+	    	
+	       
+	    });
+	}
+	
+	private void verloren(){
+		overlay = new Sprite(new Texture("loose.png"));
+		overlay.setBounds(-400, -300, 800, 600);
+		win = -1;
+	}
+	
+	private void gewonnen() {
 		
 	}
 }

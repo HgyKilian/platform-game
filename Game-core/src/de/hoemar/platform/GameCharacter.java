@@ -9,10 +9,6 @@ public class GameCharacter extends Character {
 
 	Sprite sprite;
 	Rectangle rectangle;
-//	float jumpTime = 0;
-//	int jumpStartPosition = 0;
-//	int jumpStartVelocity;
-//	int brakeVelocity = 0;
 	float velocity = 0;
 	
 	public GameCharacter() {
