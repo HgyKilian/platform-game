@@ -12,7 +12,7 @@ public class GameCharacter extends Character {
 	float velocity = 0;
 	
 	public GameCharacter() {
-		texture = new Texture("Figur.png");
+		texture = new Texture("chara.png");
 		sprite = new Sprite(texture);
 		sprite.setBounds(100 - (GameMain.width/2), y - (GameMain.height/2), 32, 32);
 		rectangle = new Rectangle(x, y - (GameMain.height/2), 32, 32);
@@ -48,6 +48,14 @@ public class GameCharacter extends Character {
 		sprite.setPosition(100 - (GameMain.width/2), y - (GameMain.height/2));
 		rectangle.set(x, y - (GameMain.height/2), 32, 32);
 			
+	}
+	
+	public void resetPosition() {
+		x=100;
+		y=32*8;
+		velocity=0;
+		sprite.setBounds(100 - (GameMain.width/2), y - (GameMain.height/2), 32, 32);
+		rectangle = new Rectangle(x, y - (GameMain.height/2), 32, 32);
 	}
 
 	

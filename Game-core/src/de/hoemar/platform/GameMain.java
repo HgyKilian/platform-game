@@ -34,11 +34,12 @@ public class GameMain extends ApplicationAdapter {
 	BitmapFont font;
 	int leben = 5;
 	int killedEnemys = 0;
-	final int EnemysToKill = 20;
+	int EnemysToKill = 20;
 	int win = 0;
 	Sprite overlay;
 	final int gravity = 2048;
 	int oldPositionY;
+	private int karte = 3;
 	
 	
 	@Override
@@ -51,11 +52,9 @@ public class GameMain extends ApplicationAdapter {
 		font.setColor(0, 0, 0, 1);
 		batch = new SpriteBatch();
 		character = new GameCharacter();
-		for (int i=0 ; i<10 ; i++) {
-			enemys.add(new Enemy(EnemyPosition.level1[i][0], EnemyPosition.level1[i][1]));
-		}
+		changeLevel(karte);
 		collision = new CollisionDetection(map);
-		changeMap(1);
+		changeMap(karte);
 	}
 
 	@Override
@@ -94,7 +93,9 @@ public class GameMain extends ApplicationAdapter {
 						killedEnemys++;
 //						win = 1;
 //						overlay.setTexture(new Texture("win.png"));
-						
+						if (killedEnemys>=EnemysToKill) {
+							gewonnen();
+						}
 					}
 					break;
 				}
@@ -203,6 +204,42 @@ public class GameMain extends ApplicationAdapter {
 	}
 	
 	private void gewonnen() {
-		
+		karte-=1;
+		if (karte >= 1){
+			changeLevel(karte);
+			changeMap(karte);
+		} else {
+			overlay = new Sprite(new Texture("win.png"));
+			overlay.setBounds(-400, -300, 800, 600);
+			win = 1;
+		}
+	}
+	
+	private void changeLevel(int karte) {
+		int levelArrayX[][];
+		int levelArrayY[];
+		character.resetPosition();
+		killedEnemys = 0;
+		isFalling=false;
+		enemys.clear();
+		if (karte==1) {
+			levelArrayX = EnemyPosition.level1;
+			levelArrayY = EnemyPosition.level1y;
+			leben=2;
+			EnemysToKill=12;
+		} else if (karte==2) {
+			levelArrayX = EnemyPosition.level2;
+			levelArrayY = EnemyPosition.level2y;
+			leben=4;
+			EnemysToKill=17;
+		} else {
+			levelArrayX = EnemyPosition.level3;
+			levelArrayY = EnemyPosition.level3y;
+			leben=5;
+			EnemysToKill=17;
+		}
+		for (int i=0 ; i<levelArrayX.length ; i++) {
+			enemys.add(new Enemy(levelArrayX[i][0], levelArrayX[i][1], levelArrayY[i]));
+		}
 	}
 }

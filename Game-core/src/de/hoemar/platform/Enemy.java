@@ -13,12 +13,13 @@ public class Enemy extends Character {
 	final int returnPosition;
 	boolean direction = false;
 	
-	public Enemy(int startPositon, int returnPosition) {
-		texture = new Texture("Figur.png");
+	public Enemy(int startPositon, int returnPosition, int yPosition) {
+		texture = new Texture("ene.png");
 		sprite = new Sprite(texture);
 		x = startPositon*32-400;
-		sprite.setBounds(x, y - (GameMain.height/2), 32, 32);
-		rectangle = new Rectangle (x+400, y - (GameMain.height/2), 32, 32);
+		y = yPosition-300;
+		sprite.setBounds(x, y, 32, 32);
+		rectangle = new Rectangle (x+400, y, 32, 32);
 		this.startPosition = startPositon;
 		this.returnPosition = returnPosition;
 	}
@@ -46,8 +47,8 @@ public class Enemy extends Character {
 				direction = true;
 			}
 		}
-		sprite.setPosition(x, y - (GameMain.height/2));
-		rectangle.set(x+400, y - (GameMain.height/2), 32, 32);
+		sprite.setPosition(x, y);
+		rectangle.set(x+400, y, 32, 32);
 		
 	}
 
